@@ -1,0 +1,113 @@
+[1mdiff --git a/src/app/login/page.tsx b/src/app/login/page.tsx[m
+[1mindex 365c224..131b90a 100644[m
+[1m--- a/src/app/login/page.tsx[m
+[1m+++ b/src/app/login/page.tsx[m
+[36m@@ -7,6 +7,7 @@[m [mimport { FaUserPlus, FaSignInAlt } from "react-icons/fa";[m
+ import Footer from "@/components/global/footer"[m
+ import Login from "@/components/login_suscribe/login";[m
+ import Suscribe from "@/components/login_suscribe/suscribe";[m
+[32m+[m[32mimport TypingEffect from "@/components/login_suscribe/typing-effect";[m[41m[m
+ [m
+ export default function LoginPage() {[m
+   const [loginButtonSelected, setLoginButtonSelected] = useState(styles.button_selected);[m
+[36m@@ -18,9 +19,8 @@[m [mexport default function LoginPage() {[m
+         <h1 className="text-4xl font-bold text-center mb-2 text-gray-200">[m
+           Secret<span className="text-pink-400">C</span>rush[m
+         </h1>[m
+[31m-        <p className="text-center text-sm text-gray-400 mb-6">[m
+[31m-          Sois toi-même, sans filtre.[m
+[31m-        </p>[m
+[32m+[m[32m        {/* Animation du texte avec caret clignotant */}[m[41m[m
+[32m+[m[32m        <TypingEffect />[m[41m[m
+ [m
+         <div className="flex justify-center gap-2 mb-6">[m
+           <button className={`text-white px-4 py-2 rounded flex items-center gap-2 ${styles.button} ${loginButtonSelected}`} onClick={() => {[m
+[1mdiff --git a/src/components/login_suscribe/suscribe.tsx b/src/components/login_suscribe/suscribe.tsx[m
+[1mindex ac71392..81d2771 100644[m
+[1m--- a/src/components/login_suscribe/suscribe.tsx[m
+[1m+++ b/src/components/login_suscribe/suscribe.tsx[m
+[36m@@ -85,11 +85,13 @@[m [mexport default function Suscribe({ onSuscribe }: SuscribeProps) {[m
+       break;[m
+     }[m
+ [m
+[32m+[m[32m    //debugger;[m[41m[m
+[32m+[m[41m[m
+     if (step < totalSteps) {[m
+       setStep(step + 1);[m
+     } else if (onSuscribe) {[m
+       onSuscribe({ email, password, firstname, gender });[m
+[31m-      router.push("/dashboard");[m
+[32m+[m[32m      //router.push("/dashboard");[m[41m[m
+     }[m
+   };[m
+ [m
+[36m@@ -177,27 +179,37 @@[m [mexport default function Suscribe({ onSuscribe }: SuscribeProps) {[m
+                   </div>[m
+                   [m
+                   <div className="space-y-2 bg-gray-800 p-4 rounded-lg">[m
+[31m-                    {['Homme', 'Femme', 'Non-binaire', 'Transgenre', 'Autre'].map((option) => ([m
+[31m-                      <div [m
+[31m-                        key={option} [m
+[31m-                        className={`flex items-center p-3 rounded cursor-pointer transition-colors ${[m
+[31m-                          gender === option ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'[m
+[31m-                        }`}[m
+[31m-                        onClick={() => setGender(option)}[m
+[31m-                      >[m
+[31m-                        <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">[m
+[31m-                          {gender === option && <div className="w-4 h-4 bg-red-500 rounded"></div>}[m
+[31m-                        </div>[m
+[31m-                        <span className="text-white">{option}</span>[m
+[32m+[m[32m                  {['Homme', 'Femme', 'Non-binaire', 'Transgenre', 'Autre'].map((option) => {[m[41m[m
+[32m+[m[32m                  const isSelected = gender.includes(option);[m[41m[m
+[32m+[m[32m                  const handleClick = () => {[m[41m[m
+[32m+[m[32m                    const newSelection = isSelected[m[41m[m
+[32m+[m[32m                      ? gender.filter(g => g !== option)[m[41m[m
+[32m+[m[32m                      : [...gender, option];[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m                    // Bloquer Homme + Femme ensemble[m[41m[m
+[32m+[m[32m                    if (newSelection.includes('Homme') && newSelection.includes('Femme')) {[m[41m[m
+[32m+[m[32m                      return; // On ignore la sélection qui combinerait les deux[m[41m[m
+[32m+[m[32m                    }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m                    setGender(newSelection);[m[41m[m
+[32m+[m[32m                  };[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m                  return ([m[41m[m
+[32m+[m[32m                    <div[m[41m[m
+[32m+[m[32m                      key={option}[m[41m[m
+[32m+[m[32m                      className={`flex items-center p-3 rounded cursor-pointer transition-colors ${[m[41m[m
+[32m+[m[32m                        isSelected ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'[m[41m[m
+[32m+[m[32m                      }`}[m[41m[m
+[32m+[m[32m                      onClick={handleClick}[m[41m[m
+[32m+[m[32m                    >[m[41m[m
+[32m+[m[32m                      <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">[m[41m[m
+[32m+[m[32m                        {isSelected && <div className="w-4 h-4 bg-red-500 rounded"></div>}[m[41m[m
+                       </div>[m
+[31m-                    ))}[m
+[31m-                  </div>[m
+[31m-                  [m
+[31m-                  {(gender === 'Homme' && step === 4) && ([m
+[31m-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4">[m
+[31m-                      <p className="text-center">Tu ne peux pas être "Homme" et "Femme" en même temps.</p>[m
+[32m+[m[32m                      <span className="text-white">{option}</span>[m[41m[m
+                     </div>[m
+[31m-                  )}[m
+[32m+[m[32m                  );[m[41m[m
+[32m+[m[32m                })}[m[41m[m
+[32m+[m[32m                  </div>[m[41m[m
+                 </div>[m
+               );[m
+       default:[m
+[36m@@ -212,10 +224,11 @@[m [mexport default function Suscribe({ onSuscribe }: SuscribeProps) {[m
+       [m
+       <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">[m
+         <div[m
+[31m-          className="absolute top-0 left-0 h-full bg-red-500"[m
+[32m+[m[32m          className="absolute top-0 left-0 h-full bg-red-500 transition-all duration-300 ease-in-out"[m[41m[m
+           style={{ width: `${progressPercentage}%` }}[m
+         ></div>[m
+       </div>[m
+[32m+[m[41m[m
+       <div className="text-center text-xs text-gray-400 mb-4">[m
+         {step} sur {totalSteps}[m
+       </div>[m

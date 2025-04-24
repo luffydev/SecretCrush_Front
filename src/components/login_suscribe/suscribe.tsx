@@ -266,7 +266,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
       else
         setStep(step + 1);
     
-        if(step == 8)
+        if(step == 8 && (!acceptedPdc || !acceptedCgu || !acceptedCgv) )
           setNextButtonDisabled(true);
 
     } else if (onSuscribe) {
