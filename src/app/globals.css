@@ -43,8 +43,8 @@
 
 :root {
   --radius: 0.625rem;
-  --background: white; /* Par exemple #f0f0f0 pour un gris clair */
-  --foreground: white; /* Par exemple #333333 pour un texte foncé */
+  --background: rgb(0, 0, 0); /* Par exemple #f0f0f0 pour un gris clair */
+  --foreground: rgb(0, 0, 0); /* Par exemple #333333 pour un texte foncé */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
