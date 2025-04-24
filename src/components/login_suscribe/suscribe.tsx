@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 import { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaUser, FaVenusMars, FaCalendar, FaMapMarkerAlt  } from "react-icons/fa";
@@ -13,7 +14,6 @@ interface SuscribeProps {
     email: string;
     password: string;
     firstname: string;
-    gender: string;
   }) => void;
 }
 
@@ -27,14 +27,14 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstname, setFirstname] = useState("");
-  const [gender, setGender] = useState("");
+  const [gender, setGender] = useState<string>(""); // L'état attend une chaîne, pas un tableau
   const [birthDay, setBirthDay] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthYear, setBirthYear] = useState("");
   const [yearOld, setYearOld] = useState("0");
   const [localisation, setLocation] = useState("");
-  const [selectedOrientations, setSelectedOrientations] = useState([]);
-  const [selectedRelations, setSelectedRelations] = useState([]);
+  const [selectedOrientations, setSelectedOrientations] = useState<string[]>([]);
+  const [selectedRelations, setSelectedRelations] = useState<string[]>([]);
 
   const [acceptedPdc, setAcceptedPdc] = useState(false);
   const [acceptedCgu, setAcceptedCgu] = useState(false);
@@ -48,7 +48,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
 
   const totalSteps = 9;
 
-  const handleCheckboxChange = (e) => {
+  const handleCheckboxChange = (e : React.ChangeEvent<HTMLInputElement>) => {
     const { id, checked } = e.target;
 
     // Mettre à jour l'état correspondant à la case cochée
@@ -77,7 +77,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
     
   }, [acceptedPdc, acceptedCgu, acceptedCgv]); // Ce useEffect se déclenche lorsque l'un de ces états change
 
-  const handleOriantationChange = (e) => {
+  const handleOriantationChange = (e : React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSelectedOrientations((prev) =>
       prev.includes(value)
@@ -86,7 +86,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
     );
   };
 
-  const handleRelationChange = (e) => {
+  const handleRelationChange = (e : React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSelectedRelations((prev) =>
       prev.includes(value)
@@ -159,10 +159,10 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
         const isValidPassword = validator.isStrongPassword(password,
           {
             minLength: 8,
-            minLowerCase: 1,
+            minLowercase: 1,
             minUppercase: 1,
             minNumbers: 1,
-            minSymbol: 1
+            minSymbols: 1
           }
         );
 
@@ -271,7 +271,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
           setNextButtonDisabled(true);
 
     } else if (onSuscribe) {
-      onSuscribe({ email, password, firstname, gender });
+      onSuscribe({ email, password, firstname });
       //router.push("/dashboard");
     }
   };
@@ -368,35 +368,29 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
                   
                   <div className="space-y-2 bg-gray-800 p-4 rounded-lg">
                   {['Homme', 'Femme', 'Non-binaire', 'Transgenre', 'Autre'].map((option) => {
-                  const isSelected = gender.includes(option);
-                  const handleClick = () => {
-                    const newSelection = isSelected
-                      ? gender.filter(g => g !== option)
-                      : [...gender, option];
+  const isSelected = gender === option; // Définir isSelected pour chaque option
 
-                    // Bloquer Homme + Femme ensemble
-                    if (newSelection.includes('Homme') && newSelection.includes('Femme')) {
-                      return; // On ignore la sélection qui combinerait les deux
-                    }
+  const handleClick = () => {
+    const newSelection = isSelected ? "" : option; // Mettre à jour la sélection
 
-                    setGender(newSelection);
-                  };
+    setGender(newSelection); // Met à jour gender avec une chaîne
+  };
 
-                  return (
-                    <div
-                      key={option}
-                      className={`flex items-center p-3 rounded cursor-pointer transition-colors ${
-                        isSelected ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'
-                      }`}
-                      onClick={handleClick}
-                    >
-                      <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">
-                        {isSelected && <div className="w-4 h-4 bg-red-500 rounded"></div>}
-                      </div>
-                      <span className="text-white">{option}</span>
-                    </div>
-                  );
-                })}
+  return (
+    <div
+      key={option}
+      className={`flex items-center p-3 rounded cursor-pointer transition-colors ${
+        isSelected ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'
+      }`}
+      onClick={handleClick}
+    >
+      <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">
+        {isSelected && <div className="w-4 h-4 bg-red-500 rounded"></div>}
+      </div>
+      <span className="text-white">{option}</span>
+    </div>
+  );
+})}
                   </div>
                 </div>
               );
