@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+
 import { FaInstagram, FaTwitter, FaFacebook, FaChevronRight } from 'react-icons/fa';
 
 const FrenchFlag = () => (

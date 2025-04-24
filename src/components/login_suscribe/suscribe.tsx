@@ -1,4 +1,4 @@
-// components/Login.tsx
+/* eslint-disable react/no-unescaped-entities */
 
 import { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaUser, FaVenusMars, FaCalendar, FaMapMarkerAlt  } from "react-icons/fa";
