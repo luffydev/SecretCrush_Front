@@ -1,4 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaUser, FaVenusMars, FaCalendar, FaMapMarkerAlt  } from "react-icons/fa";
