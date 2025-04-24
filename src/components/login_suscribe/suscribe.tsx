@@ -1,7 +1,7 @@
 // components/Login.tsx
 
 import { useState } from "react";
-import { FaEnvelope, FaLock, FaUser, FaVenusMars } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaUser, FaVenusMars, FaCalendar  } from "react-icons/fa";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import validator from 'validator';
@@ -26,9 +26,13 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
   const [firstname, setFirstname] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [gender, setGender] = useState("");
+  const [birthDay, setBirthDay] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthYear, setBirthYear] = useState("");
+
   const router = useRouter();
 
-  const totalSteps = 4;
+  const totalSteps = 9;
 
   const handleNext = () => {
 
@@ -83,9 +87,34 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
           return;
         }
       break;
-    }
 
-    //debugger;
+      case 5:
+        if(!birthDay || isNaN(parseInt(birthDay)) || birthDay > 31){
+          notifyError("Le jour de naissance doit etre un nombre entre 1 et 31");
+          return;
+        }
+      break;
+
+      case 6:
+        if(!birthMonth || isNaN(parseInt(birthMonth)) || birthMonth > 31){
+          notifyError("Le mois  de naissance doit etre un nombre entre 1 et 12");
+          return;
+        }
+      break;
+      
+      case 7:
+
+      const year = parseInt(birthYear);
+      const currentYear = new Date().getFullYear(); 
+      
+      
+      if (isNaN(year) || year <= 1900 || currentYear - year > 100) {
+        notifyError("Merci d'indiquer une année de naissance valide (ex 1999 ou 2005) ")
+        return;
+      }
+
+      break;
+    }
 
     if (step < totalSteps) {
       setStep(step + 1);
@@ -96,7 +125,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
   };
 
   const handleBack = () => {
-    notifyError("");
+
     if (step > 1) {
       setStep(step - 1);
     }
@@ -212,6 +241,110 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
                   </div>
                 </div>
               );
+
+         case 5:
+
+            return (
+              <div className="space-y-4">
+                
+                <p className="text-sm text-gray-100 text-center">
+                  🔞 Il est obligatoire de connaître ton âge pour des raisons légales, mais pas seulement ! Chaque utilisateur a le droit de choisir la tranche d’âge qu’il recherche, et la règle est la même pour tout le monde
+                </p>
+
+                <p className="text-sm text-gray-300 text-center">
+                  Quel est ton jour de naissance :
+                </p>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <FaCalendar className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="ex: 12"
+                    value={birthDay}
+                    onChange={(e) => {
+
+                      setBirthDay(e.target.value)
+                      
+                      }} 
+
+                   />
+
+                </div>
+              </div>
+            );
+
+
+          case 6:
+
+            return (
+              <div className="space-y-4">
+
+                <p className="text-sm text-gray-100 text-center">
+                  🔞 Il est obligatoire de connaître ton âge pour des raisons légales, mais pas seulement ! Chaque utilisateur a le droit de choisir la tranche d’âge qu’il recherche, et la règle est la même pour tout le monde
+                </p>
+
+                <p className="text-sm text-gray-300 text-center">
+                  Quel est ton mois de naissance :
+                </p>
+
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <FaCalendar className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="ex: 12"
+                    value={birthMonth}
+                    onChange={(e) => {
+
+                      setBirthMonth(e.target.value);
+                      
+                      }} 
+                      
+                   />
+
+                </div>
+              </div>
+            );
+
+
+          case 7:
+
+            return (
+              <div className="space-y-4">
+
+                <p className="text-sm text-gray-100 text-center">
+                  🔞 Il est obligatoire de connaître ton âge pour des raisons légales, mais pas seulement ! Chaque utilisateur a le droit de choisir la tranche d’âge qu’il recherche, et la règle est la même pour tout le monde
+                </p>
+
+                <p className="text-sm text-gray-300 text-center">
+                  Quel est ton année de naissance :
+                </p>
+
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <FaCalendar className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="ex: 1992"
+                    value={birthYear}
+                    onChange={(e) => {
+                      setBirthYear(e.target.value);
+                    }}
+
+                   />
+
+                </div>
+              </div>
+            );
       default:
         return null;
     }
