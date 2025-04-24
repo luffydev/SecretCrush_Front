@@ -7,6 +7,7 @@ import { FaUserPlus, FaSignInAlt } from "react-icons/fa";
 import Footer from "@/components/global/footer"
 import Login from "@/components/login_suscribe/login";
 import Suscribe from "@/components/login_suscribe/suscribe";
+import TypingEffect from "@/components/login_suscribe/typing-effect";
 
 export default function LoginPage() {
   const [loginButtonSelected, setLoginButtonSelected] = useState(styles.button_selected);
@@ -18,9 +19,8 @@ export default function LoginPage() {
         <h1 className="text-4xl font-bold text-center mb-2 text-gray-200">
           Secret<span className="text-pink-400">C</span>rush
         </h1>
-        <p className="text-center text-sm text-gray-400 mb-6">
-          Sois toi-même, sans filtre.
-        </p>
+        {/* Animation du texte avec caret clignotant */}
+        <TypingEffect />
 
         <div className="flex justify-center gap-2 mb-6">
           <button className={`text-white px-4 py-2 rounded flex items-center gap-2 ${styles.button} ${loginButtonSelected}`} onClick={() => {

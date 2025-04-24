@@ -85,11 +85,13 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
       break;
     }
 
+    //debugger;
+
     if (step < totalSteps) {
       setStep(step + 1);
     } else if (onSuscribe) {
       onSuscribe({ email, password, firstname, gender });
-      router.push("/dashboard");
+      //router.push("/dashboard");
     }
   };
 
@@ -177,27 +179,37 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
                   </div>
                   
                   <div className="space-y-2 bg-gray-800 p-4 rounded-lg">
-                    {['Homme', 'Femme', 'Non-binaire', 'Transgenre', 'Autre'].map((option) => (
-                      <div 
-                        key={option} 
-                        className={`flex items-center p-3 rounded cursor-pointer transition-colors ${
-                          gender === option ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'
-                        }`}
-                        onClick={() => setGender(option)}
-                      >
-                        <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">
-                          {gender === option && <div className="w-4 h-4 bg-red-500 rounded"></div>}
-                        </div>
-                        <span className="text-white">{option}</span>
+                  {['Homme', 'Femme', 'Non-binaire', 'Transgenre', 'Autre'].map((option) => {
+                  const isSelected = gender.includes(option);
+                  const handleClick = () => {
+                    const newSelection = isSelected
+                      ? gender.filter(g => g !== option)
+                      : [...gender, option];
+
+                    // Bloquer Homme + Femme ensemble
+                    if (newSelection.includes('Homme') && newSelection.includes('Femme')) {
+                      return; // On ignore la sélection qui combinerait les deux
+                    }
+
+                    setGender(newSelection);
+                  };
+
+                  return (
+                    <div
+                      key={option}
+                      className={`flex items-center p-3 rounded cursor-pointer transition-colors ${
+                        isSelected ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'
+                      }`}
+                      onClick={handleClick}
+                    >
+                      <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">
+                        {isSelected && <div className="w-4 h-4 bg-red-500 rounded"></div>}
                       </div>
-                    ))}
-                  </div>
-                  
-                  {(gender === 'Homme' && step === 4) && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4">
-                      <p className="text-center">Tu ne peux pas être "Homme" et "Femme" en même temps.</p>
+                      <span className="text-white">{option}</span>
                     </div>
-                  )}
+                  );
+                })}
+                  </div>
                 </div>
               );
       default:
@@ -212,10 +224,11 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
       
       <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
         <div
-          className="absolute top-0 left-0 h-full bg-red-500"
+          className="absolute top-0 left-0 h-full bg-red-500 transition-all duration-300 ease-in-out"
           style={{ width: `${progressPercentage}%` }}
         ></div>
       </div>
+
       <div className="text-center text-xs text-gray-400 mb-4">
         {step} sur {totalSteps}
       </div>
