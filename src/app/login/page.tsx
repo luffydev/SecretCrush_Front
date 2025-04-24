@@ -1,0 +1,60 @@
+"use client"  
+
+import styles from "./login.module.css"
+import { useState } from "react";
+import { FaUserPlus, FaSignInAlt } from "react-icons/fa";
+
+import Footer from "@/components/global/footer"
+import Login from "@/components/login_suscribe/login";
+import Suscribe from "@/components/login_suscribe/suscribe";
+
+export default function LoginPage() {
+  const [loginButtonSelected, setLoginButtonSelected] = useState(styles.button_selected);
+  const [suscribeButtonSelected, setSuscribeButtonSelected] = useState("");
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#192130] to-[#192130] flex items-center justify-center p-4">
+      <div className="bg-[#192130] border border-red-500 shadow-lg shadow-red-500/20 rounded-2xl p-8 w-full max-w-md text-white"  style={{ animation: 'auraPulse 2s ease-in-out infinite' }}>
+        <h1 className="text-4xl font-bold text-center mb-2 text-gray-200">
+          Secret<span className="text-pink-400">C</span>rush
+        </h1>
+        <p className="text-center text-sm text-gray-400 mb-6">
+          Sois toi-même, sans filtre.
+        </p>
+
+        <div className="flex justify-center gap-2 mb-6">
+          <button className={`text-white px-4 py-2 rounded flex items-center gap-2 ${styles.button} ${loginButtonSelected}`} onClick={() => {
+                  if (loginButtonSelected === "") {
+                     setLoginButtonSelected(styles.button_selected);
+                     setSuscribeButtonSelected("");
+                  }
+          }}>
+
+            <FaSignInAlt /> Connexion
+          </button>
+          <button className={`text-white px-4 py-2 rounded flex items-center gap-2 ${styles.button} ${suscribeButtonSelected}`} onClick={() => {
+                  if (suscribeButtonSelected === "") {
+                    setSuscribeButtonSelected(styles.button_selected);
+                    setLoginButtonSelected("");
+                  }
+          }}>
+
+            <FaUserPlus /> Inscription
+          </button>
+        </div>
+
+        {/* Login component */}
+
+       {/* Login component */}
+       {loginButtonSelected !== "" && <Login onLogin={() => console.log("Connecté !")} />}
+        
+
+        {/* Suscription component */}
+        {suscribeButtonSelected !== "" && <Suscribe onSuscribe={() => console.log("Suscribe !")} />}
+
+        {/* Footer component */}
+        <Footer />
+      </div>
+    </div>
+  );
+}

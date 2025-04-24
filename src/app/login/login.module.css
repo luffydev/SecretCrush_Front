@@ -1,0 +1,24 @@
+
+
+.input_login_password{
+    text-align: center;
+}
+
+
+.button{
+    cursor: pointer;
+    border: 2px solid #ef4444;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: transparent;
+}
+
+.button:hover {
+    background-color: #ef4444;
+    color: white;
+  }
+
+.button_selected{
+    border:2px solid #FFF !important;
+    color:#1c0808 !important;
+    background-color: #ef4444!important;
+}
