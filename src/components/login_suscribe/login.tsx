@@ -1,16 +1,23 @@
 // components/Login.tsx
 
+"use client";
+
 import { useState } from "react";
 import { FaEnvelope, FaLock, FaSignInAlt } from "react-icons/fa";
 import { Switch } from "@/components/ui/switch"; 
 
 import styles from "./../../app/login/login.module.css";
 
+import { useToast } from "@/lib/toast-context";
+
 interface LoginProps {
   onLogin?: () => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
+
+  const { notifyError } = useToast();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +30,7 @@ export default function Login({ onLogin }: LoginProps) {
     if (email && password) {
       onLogin?.();
     } else {
-      setError("Remplis tous les champs !");
+      notifyError("Remplis tous les champs !");
     }
   };
 

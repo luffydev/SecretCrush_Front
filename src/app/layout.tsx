@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
+import { ToastProvider } from "@/lib/toast-context"; // Importe ton ToastProvider
+
 export const metadata: Metadata = {
   title: 'SecretCrush',
   description: 'Sois toi-même, sans filtre',
@@ -18,7 +20,9 @@ export default function RootLayout({
 }) {
   return (
     <html className="dark">
-      <body>{children}</body>
+      <ToastProvider>
+        <body>{children}</body>
+      </ToastProvider>
     </html>
   )
 }

@@ -5,6 +5,7 @@ import { FaEnvelope, FaLock, FaUser, FaVenusMars } from "react-icons/fa";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import validator from 'validator';
+import { useToast } from "@/lib/toast-context";
 
 interface SuscribeProps {
   onSuscribe?: (data: {
@@ -16,31 +17,32 @@ interface SuscribeProps {
 }
 
 export default function Suscribe({ onSuscribe }: SuscribeProps) {
+
+  const { notifyError } = useToast();
+
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstname, setFirstname] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [gender, setGender] = useState("");
   const router = useRouter();
 
   const totalSteps = 4;
 
   const handleNext = () => {
-    setError("");
 
     switch(step)
     {
       // Verify Email
       case 1:
         if(!email){
-          setError("L'email est requis");
+          notifyError("L'email est requis");
           return;
         }
 
         if(!validator.isEmail(email)){
-          setError("L'adresse email n'est pas valide");
+          notifyError("L'adresse email n'est pas valide");
           return;
         }
 
@@ -60,7 +62,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
         );
 
         if(!isValidPassword){
-          setError("Le mot de passe doit comporter au moins 8 caractères, incluant une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.");
+          notifyError("Le mot de passe doit comporter au moins 8 caractères, incluant une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.");
           return;
         }
 
@@ -69,7 +71,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
       // Verify firstname
       case 3:
         if(!firstname){
-          setError("Le prénom est requis");
+          notifyError("Le prénom est requis");
           return;
         }
       break;
@@ -77,7 +79,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
       // Verify gender logic
       case 4:
         if(!gender){
-          setError("Veuillez selectionner une option");
+          notifyError("Veuillez selectionner une option");
           return;
         }
       break;
@@ -92,7 +94,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
   };
 
   const handleBack = () => {
-    setError("");
+    notifyError("");
     if (step > 1) {
       setStep(step - 1);
     }
@@ -217,12 +219,6 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
       <div className="text-center text-xs text-gray-400 mb-4">
         {step} sur {totalSteps}
       </div>
-
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-          <p className="text-center">{error}</p>
-        </div>
-      )}
 
       {renderStep()}
 
