@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   }
 }
 
+
 export default function RootLayout({
   children,
 }: {
@@ -20,9 +21,11 @@ export default function RootLayout({
 }) {
   return (
     <html className="dark">
-      <ToastProvider>
-        <body>{children}</body>
-      </ToastProvider>
+      <body>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+      </body>
     </html>
   )
 }
