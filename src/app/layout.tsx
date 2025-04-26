@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 import { ToastProvider } from "@/lib/toast-context"; // Importe ton ToastProvider
+import AppLoader from "@/components/global/appLoader";
 
 export const metadata: Metadata = {
   title: 'SecretCrush',
@@ -22,9 +23,13 @@ export default function RootLayout({
   return (
     <html className="dark">
       <body>
+        
+        <AppLoader />
+        
         <ToastProvider>
           {children}
         </ToastProvider>
+
       </body>
     </html>
   )

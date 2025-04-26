@@ -2,22 +2,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
-import { useState, useEffect } from "react";
-import { FaEnvelope, FaLock, FaUser, FaVenusMars, FaCalendar, FaMapMarkerAlt  } from "react-icons/fa";
+
 import { Switch } from "@/components/ui/switch";
+import ReCaptcha from "@/components/ui/recaptcha";
+import { useToast } from "@/lib/toast-context";
+import api from '@/lib/api';
+
+import { useState, useEffect } from "react";
+import { FaEnvelope, FaLock, FaUser, FaVenusMars, FaCalendar, FaMapMarkerAlt, FaCheckCircle} from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import validator from 'validator';
-import { useToast } from "@/lib/toast-context";
 
 interface SuscribeProps {
-  onSuscribe?: (data: {
-    email: string;
-    password: string;
-    firstname: string;
-  }) => void;
+  onSuscribeSuccess?: () => void;
 }
 
-export default function Suscribe({ onSuscribe }: SuscribeProps) {
+export default function Suscribe({ onSuscribeSuccess }: SuscribeProps) {
 
   const { notifyError } = useToast();
 
@@ -33,8 +33,10 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
   const [birthYear, setBirthYear] = useState("");
   const [yearOld, setYearOld] = useState("0");
   const [localisation, setLocation] = useState("");
+  const [localisationGPS, setLocalisationGPS] = useState([0, 0]);
   const [selectedOrientations, setSelectedOrientations] = useState<string[]>([]);
   const [selectedRelations, setSelectedRelations] = useState<string[]>([]);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
 
   const [acceptedPdc, setAcceptedPdc] = useState(false);
   const [acceptedCgu, setAcceptedCgu] = useState(false);
@@ -42,7 +44,9 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
 
   const [isGeolocalisationLoading, setGeolocalisationLoading] = useState(false);
   const [isNextButtonDisabled, setNextButtonDisabled] = useState(false);
+  const [isNextButtonLoading, setNextButtonLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [subscriptionSuccess, setSubscriptionSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -112,7 +116,10 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
           if (data.results.length > 0) {
             const city = data.results[0].components.city || data.results[0].components.town;
             const postalCode = data.results[0].components.postcode;
+            
             setLocation(`Localisé : ${city} (${postalCode})`);
+            setLocalisationGPS([latitude, longitude]);
+
             setNextButtonDisabled(false);
 
           } else {
@@ -135,7 +142,7 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
 
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
 
     switch(step)
     {
@@ -148,6 +155,25 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
 
         if(!validator.isEmail(email)){
           notifyError("L'adresse email n'est pas valide");
+
+          debugger;
+          return;
+        }
+
+        setNextButtonDisabled(true);
+        setNextButtonLoading(true);
+
+        const payload = {
+          email: email
+        };
+
+        const response = await api.post('account/checkEmail', payload);
+
+        setNextButtonDisabled(false);
+        setNextButtonLoading(false);
+
+        if(!response || !response.success){
+          notifyError('Cette adresse email est déjà utilisée !');
           return;
         }
 
@@ -270,10 +296,40 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
         if(step == 8 && (!acceptedPdc || !acceptedCgu || !acceptedCgv) )
           setNextButtonDisabled(true);
 
-    } else if (onSuscribe) {
-      onSuscribe({ email, password, firstname });
-      //router.push("/dashboard");
-    }
+       } else if (onSuscribeSuccess) {
+
+          const birthTime = new Date(Number(birthYear), Number(birthMonth) -1, Number(birthDay));
+          const payload = {
+            
+            email : email,
+            password: password, 
+            firstname: firstname,
+            gender: gender,
+            birthDate: ( birthTime.getTime() / 1000 ),
+            latitude: localisationGPS[0],
+            longitude: localisationGPS[1],
+            orientation: selectedOrientations,
+            relations: selectedRelations,
+            token: recaptchaToken
+          }
+
+          setNextButtonLoading(true);
+          setNextButtonDisabled(true)
+
+          const response = await api.post('account/signup', payload);
+
+          if(!response || !response.success)
+            notifyError("Une erreur est survenue lors de l'inscription");
+          else
+            setSubscriptionSuccess(true);
+
+          setNextButtonLoading(true);
+          setNextButtonDisabled(true)
+
+          
+
+
+       }
   };
 
   const handleBack = () => {
@@ -368,29 +424,29 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
                   
                   <div className="space-y-2 bg-gray-800 p-4 rounded-lg">
                   {['Homme', 'Femme', 'Non-binaire', 'Transgenre', 'Autre'].map((option) => {
-  const isSelected = gender === option; // Définir isSelected pour chaque option
+                        const isSelected = gender === option; // Définir isSelected pour chaque option
 
-  const handleClick = () => {
-    const newSelection = isSelected ? "" : option; // Mettre à jour la sélection
+                        const handleClick = () => {
+                          const newSelection = isSelected ? "" : option; // Mettre à jour la sélection
 
-    setGender(newSelection); // Met à jour gender avec une chaîne
-  };
+                          setGender(newSelection); // Met à jour gender avec une chaîne
+                        };
 
-  return (
-    <div
-      key={option}
-      className={`flex items-center p-3 rounded cursor-pointer transition-colors ${
-        isSelected ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'
-      }`}
-      onClick={handleClick}
-    >
-      <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">
-        {isSelected && <div className="w-4 h-4 bg-red-500 rounded"></div>}
-      </div>
-      <span className="text-white">{option}</span>
-    </div>
-  );
-})}
+                        return (
+                          <div
+                            key={option}
+                            className={`flex items-center p-3 rounded cursor-pointer transition-colors ${
+                              isSelected ? 'bg-gray-600' : 'bg-gray-700 hover:bg-gray-600'
+                            }`}
+                            onClick={handleClick}
+                          >
+                            <div className="w-6 h-6 mr-3 border border-gray-400 rounded flex items-center justify-center">
+                              {isSelected && <div className="w-4 h-4 bg-red-500 rounded"></div>}
+                            </div>
+                            <span className="text-white">{option}</span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               );
@@ -725,6 +781,13 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
                         <a href="#" data-doc="cgv.php" className="text-primary hover:underline doc-link">Conditions Générales de Vente</a>.
                       </span>
                     </label>
+
+                    <ReCaptcha
+                      siteKey={process.env.SC_RECAPTCHA_KEY??''}
+                      action="submit"
+                      onToken={(newToken) => setRecaptchaToken(newToken)}
+                    />
+
                   </div>
                 );
 
@@ -740,20 +803,59 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
   return (
     <div className="max-w-md mx-auto p-6 space-y-6">
       
-      <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-        <div
-          className="absolute top-0 left-0 h-full bg-red-500 transition-all duration-300 ease-in-out"
-          style={{ width: `${progressPercentage}%` }}
-        ></div>
-      </div>
 
-      <div className="text-center text-xs text-gray-400 mb-4">
-        {step} sur {totalSteps}
-      </div>
+      {!subscriptionSuccess && 
+        <>
+          <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
+            <div
+              className="absolute top-0 left-0 h-full bg-red-500 transition-all duration-300 ease-in-out"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
 
-      {renderStep()}
+          <div className="text-center text-xs text-gray-400 mb-4">
+            {step} sur {totalSteps}
+          </div>
+        </>
+      }
+      
 
-      { subStep != 3 &&
+      
+
+      {!subscriptionSuccess && 
+
+        renderStep()
+
+      }
+      
+
+      {subscriptionSuccess &&
+
+          <div className="max-w-md mx-auto p-6 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+          <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-transparent">
+              <FaCheckCircle className="w-12 h-12 text-green-500 animate-bounce" />
+            </div>
+            
+            <h2 className="text-2xl font-bold text-white">
+              Félicitations !
+            </h2>
+            
+            <p className="text-gray-300">
+              Votre inscription s'est déroulée avec succès. Vous allez recevoir un email de confirmation à l'adresse que vous avez fournie.
+            </p>
+            
+            <button
+              onClick={() => onSuscribeSuccess?.()}
+              className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-md shadow-lg hover:from-green-700 hover:to-green-800 transition duration-300 hover:scale-105"
+            >
+              Continuer
+            </button>
+          </div>
+        </div>
+     }
+
+      { subStep != 3 && !subscriptionSuccess &&
 
           <div className="flex justify-between">
           {step > 1 && (
@@ -764,13 +866,23 @@ export default function Suscribe({ onSuscribe }: SuscribeProps) {
               Retour
             </button>
           )}
+          
           <button
             onClick={handleNext}
-            className={`${isNextButtonDisabled ? "ml-auto px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600" : "ml-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" }`}
+            className={`ml-auto flex items-center justify-center gap-2 px-6 py-3 text-lg font-semibold rounded-md ${
+              isNextButtonDisabled
+                ? "bg-gray-500 hover:bg-gray-600"
+                : "bg-red-600 hover:bg-red-700"
+            } text-white`}
             disabled={isNextButtonDisabled}
           >
-            {step === totalSteps ? "Terminer" : "Suivant"}
+              {isNextButtonLoading &&
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+              }
+              
+              {step === totalSteps ? "Terminer" : "Suivant"}
           </button>
+
         </div>
 
       }
