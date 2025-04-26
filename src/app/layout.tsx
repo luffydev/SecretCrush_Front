@@ -2,7 +2,11 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 import { ToastProvider } from "@/lib/toast-context"; // Importe ton ToastProvider
+import { LayoutEventProvider } from "@/components/global/layoutEventContext";
+
 import AppLoader from "@/components/global/appLoader";
+import AccountActivationLoader from "@/components/global/accountActivationPage";
+// import ErrorPage from "@/components/global/errorPage";
 
 export const metadata: Metadata = {
   title: 'SecretCrush',
@@ -14,22 +18,19 @@ export const metadata: Metadata = {
   }
 }
 
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html className="dark">
       <body>
-        
-        <AppLoader />
-        
-        <ToastProvider>
-          {children}
-        </ToastProvider>
-
+        <LayoutEventProvider>
+          <AccountActivationLoader /> {/* On l'écoute ici */}
+          
+          <AppLoader />
+          
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </LayoutEventProvider>
       </body>
     </html>
   )

@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaSignInAlt } from "react-icons/fa";
 import { Switch } from "@/components/ui/switch"; 
 import validator from 'validator';
@@ -11,6 +11,8 @@ import validator from 'validator';
 import styles from "./../../app/login/login.module.css";
 import { useToast } from "@/lib/toast-context";
 import api from '@/lib/api';
+import { useLayoutEventContext } from "@/components/global/layoutEventContext";
+import { useSearchParams } from 'next/navigation';
 
 interface LoginProps {
   apiError: boolean,
@@ -19,14 +21,50 @@ interface LoginProps {
 
 export default function Login({ apiError, onLogin }: LoginProps) {
 
-  const { notifyError, notifySuccess } = useToast();
+  const { setEvent } = useLayoutEventContext();
 
+  const { notifyError, notifySuccess } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const [error] = useState("");
   const [isLoading, setIsLoading] = useState(false); // État pour gérer le chargement
+
+  const searchParams = useSearchParams();
+  const activateParam = searchParams.get('activate');
+
+  useEffect(() => {
+
+    if(activateParam != null){
+      setEvent('accountActivationStart');  // Déclenche l'affichage du loader
+
+      const activateAccount = async (token : string) => {
+
+        setTimeout(async () => {
+
+          const payload = {token : token};
+          const response = await api.post('account/activate', payload);
+
+          if(!response || !response.success)
+          {
+
+              setEvent('accountActivationEnd');
+              notifyError('Impossible d\'activer votre compte, veuillez reesayer');
+
+
+          }else
+          {         
+              setEvent('accountActivationEnd');
+              notifySuccess('Votre compte a été activé avec succès !');
+          }
+
+        }, 8000);
+      }
+
+      activateAccount(activateParam);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

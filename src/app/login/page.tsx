@@ -1,7 +1,7 @@
 "use client"  
 
 import styles from "./login.module.css"
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { FaUserPlus, FaSignInAlt } from "react-icons/fa";
 
 import Footer from "@/components/global/footer"
@@ -78,12 +78,18 @@ export default function LoginPage() {
         {/* Login component */}
 
        {/* Login component */}
-       {loginButtonSelected !== "" && <Login apiError={apiError} onLogin={() => console.log("Connecté !")} />}
+       {loginButtonSelected !== "" && 
+       
+        <Suspense fallback={<div>Loading...</div>}>
+            <Login apiError={apiError} onLogin={() => console.log("Connecté !")} />
+        </Suspense>
+       
+       }
         
 
          {/* Suscription component */}
          {suscribeButtonSelected !== "" &&  
-         
+
             <Suscribe onSuscribeSuccess={() => {
 
               setLoginButtonSelected(styles.button_selected);
