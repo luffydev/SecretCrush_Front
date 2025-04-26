@@ -82,7 +82,16 @@ export default function LoginPage() {
         
 
          {/* Suscription component */}
-         {suscribeButtonSelected !== "" && <Suscribe onSuscribe={() => console.log("Suscribe !")} />}
+         {suscribeButtonSelected !== "" &&  
+         
+            <Suscribe onSuscribeSuccess={() => {
+
+              setLoginButtonSelected(styles.button_selected);
+              setSuscribeButtonSelected("");
+
+            }}
+            />
+        }
       
 
         {/* Footer component */}
