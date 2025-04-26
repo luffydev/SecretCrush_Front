@@ -50,7 +50,17 @@ export default function Login({ apiError, onLogin }: LoginProps) {
         
         if(!response || !response.success){
 
-          notifyError("Email ou mot de passe invalide");
+          if(!response)
+          {
+            notifyError("Une erreur est survenue, veuillez reesayer");  
+            return;
+          }
+
+          if(!response.success && response.error == 'not_activated_account')
+            notifyError("Votre compte n'est pas activé merci de l'activer via l'email que vous avez reçu");
+          else
+            notifyError("Email ou mot de passe invalide");
+          
           setIsLoading(false);
           return;
 
