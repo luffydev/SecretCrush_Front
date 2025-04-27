@@ -3,18 +3,23 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react'; // Icône alerte sympa
+import { useLayoutEventContext } from '@/components/global/layoutEventContext'; // Import du contexte
+
 
 export default function ErrorPage() {
-  const [isVisible] = useState(true);
-  const router = useRouter();
+
+  const { event } = useLayoutEventContext();  // Récupère l'événement
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => router.push('/'), 5000); // Redirige après 5 sec
-    return () => clearTimeout(timer);
-  }, [router]);
+    if (event === 'showErrorStart') {
+      setIsVisible(true);
+    } else if (event === 'showErrorEnd') {
+      setIsVisible(false);
+    }
+  }, [event]);
 
   return (
     <AnimatePresence>

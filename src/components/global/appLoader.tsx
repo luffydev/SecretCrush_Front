@@ -2,15 +2,70 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '@/lib/api'
+import { usePathname, useRouter } from 'next/navigation';
+import { parseCookies } from 'nookies';
+import { useLayoutEventContext } from "@/components/global/layoutEventContext";
 
 export default function AppLoader() {
   const [isLoading, setIsLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
 
+  const { setEvent } = useLayoutEventContext();
+
+  const pathName = usePathname();
+  const router = useRouter();
+
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
+
+    async function getCsrfToken(){
+        await api.fetchCsrfToken();
+
+        checkSession();
+    }
+
+    async function checkSession(){
+        const cookies = parseCookies();
+        const token = cookies.auth_token;
+
+        const payload = {token : token};
+        const response = await api.post('account/check_session', payload);
+
+        if(token){
+            
+            if(pathName == '/login'){
+
+                if(response && response.success == true){
+
+                    router.push('/dashboard');
+                    setTimeout(() => {setIsLoading(false)}, 3000);
+
+                }
+                
+            }else {
+
+                if(!response || !response.success){
+
+                    router.push('/login');
+                    setTimeout(() => {setIsLoading(false)}, 3000);
+                }else{
+                    setTimeout(() => {setIsLoading(false)}, 3000);
+                    setEvent('showErrorStart');
+                }
+                    
+            }
+        }else{
+
+            router.push('/login');
+            setTimeout(() => {setIsLoading(false)}, 3000);
+
+        }
+        
+    }
+
+    getCsrfToken();
+    
+  }, [pathName]);
 
   return (
     <AnimatePresence>

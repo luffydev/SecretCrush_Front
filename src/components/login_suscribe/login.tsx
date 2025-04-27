@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaSignInAlt } from "react-icons/fa";
 import { Switch } from "@/components/ui/switch"; 
 import validator from 'validator';
-
+import { useRouter } from 'next/navigation';
 import styles from "./../../app/login/login.module.css";
 import { useToast } from "@/lib/toast-context";
 import api from '@/lib/api';
@@ -22,6 +22,7 @@ interface LoginProps {
 export default function Login({ apiError, onLogin }: LoginProps) {
 
   const { setEvent } = useLayoutEventContext();
+  const router = useRouter();
 
   const { notifyError, notifySuccess } = useToast();
   const [email, setEmail] = useState("");
@@ -51,12 +52,15 @@ export default function Login({ apiError, onLogin }: LoginProps) {
 
               setEvent('accountActivationEnd');
               notifyError('Impossible d\'activer votre compte, veuillez reesayer');
+              router.push('/login');
 
 
           }else
           {         
               setEvent('accountActivationEnd');
               notifySuccess('Votre compte a été activé avec succès !');
+              router.push('/login');
+              
           }
 
         }, 8000);
@@ -104,8 +108,7 @@ export default function Login({ apiError, onLogin }: LoginProps) {
 
         }else{
 
-          notifySuccess("Bienvenue : " + email + " !!!!!!!!!");
-          setIsLoading(false);
+          router.push('/dashboard');
           return;
 
         }

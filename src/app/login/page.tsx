@@ -1,49 +1,19 @@
 "use client"  
 
 import styles from "./login.module.css"
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { FaUserPlus, FaSignInAlt } from "react-icons/fa";
 
 import Footer from "@/components/global/footer"
 import Login from "@/components/login_suscribe/login";
 import Suscribe from "@/components/login_suscribe/suscribe";
 import TypingEffect from "@/components/login_suscribe/typing-effect";
-import { useToast } from "@/lib/toast-context";
-import api from "@/lib/api";
 
 export default function LoginPage() {
-  
-  const {notifyError} = useToast();
 
-     
-  const [csrfToken] = useState("");
-  const [apiError, setAPIError] = useState(false);
+  const [apiError] = useState(false);
   const [loginButtonSelected, setLoginButtonSelected] = useState(styles.button_selected);
   const [suscribeButtonSelected, setSuscribeButtonSelected] = useState("");
-
-  useEffect(() => {
-
-    async function fetchCsrfToken(){
-
-      try{
-        
-       await api.fetchCsrfToken();
-
-      }catch{
-
-        setAPIError(true);
-        notifyError("Impossible de charger les données depuis l'API, veuillez reesayer plus tard.");
-        
-      }
-    }
-
-    if(!csrfToken)
-      fetchCsrfToken();
-
-  }, []);
-
-
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#192130] to-[#192130] flex items-center justify-center p-4">

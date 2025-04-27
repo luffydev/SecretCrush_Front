@@ -9,37 +9,40 @@ class API {
       this.baseUrl = process.env.SC_API_URL || 'http://localhost:3001/api';
       this.jwtToken = null;
       this.csrfToken = null;
-      
-      // Initialiser le token CSRF au démarrage
-      if (typeof window !== 'undefined') {
-        this.fetchCsrfToken();
-      }
     }
     
     // Récupérer le token CSRF du serveur
     async fetchCsrfToken() {
-      try {
-        const response = await fetch(`${this.baseUrl}/csrf-token`, {
-          method: 'GET',
-          credentials: 'include', // Important pour recevoir les cookies
-          headers: {
-            'x-api-key': process.env.SC_API_BASE_KEY ?? ''
+
+      if(!this.getCsrfToken()){
+
+        try {
+          const response = await fetch(`${this.baseUrl}/csrf-token`, {
+            method: 'GET',
+            credentials: 'include', // Important pour recevoir les cookies
+            headers: {
+              'x-api-key': process.env.SC_API_BASE_KEY ?? ''
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            this.setCsrfToken(data.token);
           }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          this.setCsrfToken(data.token);
+        } catch (error) {
+          console.error('Erreur lors de la récupération du token CSRF:', error);
         }
-      } catch (error) {
-        console.error('Erreur lors de la récupération du token CSRF:', error);
-      }
+      }     
     }
     
     // Méthode pour définir le CSRF Token
     setCsrfToken(token: string) {
       this.csrfToken = token;
       // Ne pas redéfinir le cookie, le serveur l'a déjà fait
+    }
+
+    getCsrfToken(){
+      return this.csrfToken;
     }
     
     // Méthode pour obtenir les en-têtes
