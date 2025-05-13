@@ -5,7 +5,7 @@ const withPWA = require('next-pwa');
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   env: {
-    SC_API_URL: 'http://http://34.155.60.160/api',  // URL de l'API
+    SC_API_URL: 'http://34.155.60.160/api',  // URL de l'API
     SC_API_BASE_KEY: 'c3bc7d56-e96c-4e00-ae5a-cfb74fb5a2a2', // Clé API secrète
     SC_RECAPTCHA_KEY: '6LfRnjcrAAAAAHco-4dymWfIxhf0zJ2XbQmNPcPt'
   },
