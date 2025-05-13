@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://34.155.60.160:8443/api/:path*" // Ton API sur GCP
+      "destination": "https://34.155.60.160:8443/api/:path*" 
     }
   ]
 }
