@@ -7,6 +7,7 @@ import { LayoutEventProvider } from "@/components/global/layoutEventContext";
 import AppLoader from "@/components/global/appLoader";
 import AccountActivationLoader from "@/components/global/accountActivationPage";
 import ErrorPage from "@/components/global/errorPage";
+import ClientSideSetup from './client'; 
 
 export const metadata: Metadata = {
   title: 'SecretCrush',
@@ -18,14 +19,18 @@ export const metadata: Metadata = {
   }
 }
 
+
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <html className="dark">
       <body>
         <LayoutEventProvider>
-          
-          <AccountActivationLoader /> {/* On l'écoute ici */}
+
+          <AccountActivationLoader /> 
           <ErrorPage />
+          <ClientSideSetup />
           
           <AppLoader />
           

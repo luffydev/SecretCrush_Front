@@ -1,100 +1,114 @@
-/**
- * Copyright 2018 Google Inc. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Nom du cache
+const CACHE_NAME = "secretcrush-cache";
 
-// If the loader is already loaded, just stop.
-if (!self.define) {
-  let registry = {};
+// Liste des fichiers à cacher
+const FILES_TO_CACHE = [
+  '/offline.html',
+  '/favicon.ico',
+  '/manifest.json',
+];
 
-  // Used for `eval` and `importScripts` where we can't get script URL by other means.
-  // In both cases, it's safe to use a global var because those functions are synchronous.
-  let nextDefineUri;
+// Installation du Service Worker
+self.addEventListener('install', (event) => {
+  console.log('[ServiceWorker] Install');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('[ServiceWorker] Pre-caching offline page');
+        return cache.addAll(FILES_TO_CACHE);
+      })
+  );
+  self.skipWaiting();
+});
 
-  const singleRequire = (uri, parentUri) => {
-    uri = new URL(uri + ".js", parentUri).href;
-    return registry[uri] || (
-      
-        new Promise(resolve => {
-          if ("document" in self) {
-            const script = document.createElement("script");
-            script.src = uri;
-            script.onload = resolve;
-            document.head.appendChild(script);
-          } else {
-            nextDefineUri = uri;
-            importScripts(uri);
-            resolve();
+// Activation du Service Worker
+self.addEventListener('activate', (event) => {
+  console.log('[ServiceWorker] Activate');
+  event.waitUntil(
+    caches.keys().then((keyList) => {
+      return Promise.all(
+        keyList.map((key) => {
+          if (key !== CACHE_NAME) {
+            console.log('[ServiceWorker] Removing old cache', key);
+            return caches.delete(key);
           }
         })
-      
-      .then(() => {
-        let promise = registry[uri];
-        if (!promise) {
-          throw new Error(`Module ${uri} didn’t register its module`);
-        }
-        return promise;
-      })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// Interception des requêtes
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match('/offline.html'))
     );
-  };
+  } else {
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => response || fetch(event.request))
+    );
+  }
+});
 
-  self.define = (depsNames, factory) => {
-    const uri = nextDefineUri || ("document" in self ? document.currentScript.src : "") || location.href;
-    if (registry[uri]) {
-      // Module is already loading or loaded.
-      return;
-    }
-    let exports = {};
-    const require = depUri => singleRequire(depUri, uri);
-    const specialDeps = {
-      module: { uri },
-      exports,
-      require
-    };
-    registry[uri] = Promise.all(depsNames.map(
-      depName => specialDeps[depName] || require(depName)
-    )).then(deps => {
-      factory(...deps);
-      return exports;
-    });
-  };
-}
-define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
+// Notifications Push
+self.addEventListener('push', (event) => {
+  console.log('[Service Worker] Push reçu.');
 
-  importScripts();
-  self.skipWaiting();
-  workbox.clientsClaim();
-  workbox.registerRoute("/", new workbox.NetworkFirst({
-    "cacheName": "start-url",
-    plugins: [{
-      cacheWillUpdate: async ({
-        request,
-        response,
-        event,
-        state
-      }) => {
-        if (response && response.type === 'opaqueredirect') {
-          return new Response(response.body, {
-            status: 200,
-            statusText: 'OK',
-            headers: response.headers
-          });
-        }
-        return response;
+  let data = {};
+
+  try {
+    // Vérifie si event.data existe et tente de le parser en JSON
+    if (event.data) {
+      
+      console.log("test");
+      console.log(event.data.text());
+
+      let test = null;
+
+      try{
+        test = event.data.json();
+      }catch{
+        test = event.data.text();
       }
-    }]
-  }), 'GET');
-  workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
-    "cacheName": "dev",
-    plugins: []
-  }), 'GET');
+      
+      data = test;
+    }
+  } catch (error) {
+    console.error('[Service Worker] Erreur de parsing JSON:', error);
+    
+    // Si ce n'est pas du JSON valide, utiliser un texte brut par défaut
+    data = { title: 'Nouvelle Notification', body: 'Erreur dans le message Push.' };
+  }
 
-}));
+  // Si `data` n'est pas encore un objet JSON valide, il est probablement du texte brut
+  if (typeof data === 'string') {
+    data = { title: 'Nouvelle Notification', body: data };
+  }
+
+  const title = data.title || 'Nouvelle Notification';
+  const options = {
+    body: data.body || 'Vous avez un nouveau message.',
+    icon: '/logo192.png', // Ton icône
+    badge: '/favicon.ico',
+  };
+
+  // Afficher la notification
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+
+self.addEventListener('install', (event) => {
+  console.log('[ServiceWorker] Install');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('[ServiceWorker] Pre-caching offline page');
+        return cache.addAll(FILES_TO_CACHE);
+      })
+  );
+  self.skipWaiting();
+});

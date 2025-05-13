@@ -37,6 +37,7 @@ export default function Suscribe({ onSuscribeSuccess }: SuscribeProps) {
   const [selectedOrientations, setSelectedOrientations] = useState<string[]>([]);
   const [selectedRelations, setSelectedRelations] = useState<string[]>([]);
   const [recaptchaToken, setRecaptchaToken] = useState('');
+  const [activationToken, setActivationToken] = useState('');
 
   const [acceptedPdc, setAcceptedPdc] = useState(false);
   const [acceptedCgu, setAcceptedCgu] = useState(false);
@@ -321,7 +322,10 @@ export default function Suscribe({ onSuscribeSuccess }: SuscribeProps) {
           if(!response || !response.success)
             notifyError("Une erreur est survenue lors de l'inscription");
           else
+          {
             setSubscriptionSuccess(true);
+            setActivationToken(response.debug_activation_code);
+          }
 
           setNextButtonLoading(true);
           setNextButtonDisabled(true)
@@ -843,6 +847,11 @@ export default function Suscribe({ onSuscribeSuccess }: SuscribeProps) {
             
             <p className="text-gray-300">
               Votre inscription s'est déroulée avec succès. Vous allez recevoir un email de confirmation à l'adresse que vous avez fournie.
+            </p>
+
+            <p className="text-gray-300">
+
+              <input type="text" value={activationToken}></input>
             </p>
             
             <button
