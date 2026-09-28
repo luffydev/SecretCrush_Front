@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://luffydev.hd.free.fr:8443/api/:path*" 
+      "destination": "https://luffydev.hd.free.fr:16385/api/:path*" 
     }
   ]
 }
