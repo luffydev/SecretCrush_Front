@@ -791,7 +791,7 @@ export default function Suscribe({ onSuscribeSuccess }: SuscribeProps) {
                       action="submit"
                       onToken={(newToken) => setRecaptchaToken(newToken)}
                     />*/}
-
+ 
                   </div>
                 );
 
