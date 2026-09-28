@@ -786,11 +786,11 @@ export default function Suscribe({ onSuscribeSuccess }: SuscribeProps) {
                       </span>
                     </label>
 
-                    <ReCaptcha
+                    {/*<ReCaptcha
                       siteKey={process.env.SC_RECAPTCHA_KEY??''}
                       action="submit"
                       onToken={(newToken) => setRecaptchaToken(newToken)}
-                    />
+                    />*/}
 
                   </div>
                 );
