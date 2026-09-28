@@ -107,7 +107,7 @@ export default function Suscribe({ onSuscribeSuccess }: SuscribeProps) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
-        const apiKey = 'e930ccf877424fbb84bed73504ee6a75'; // Remplace par ta clé API
+        const apiKey = '4664150a1ccb41f3b724725dfda88c24'; // Remplace par ta clé API
         const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
 
         try {
